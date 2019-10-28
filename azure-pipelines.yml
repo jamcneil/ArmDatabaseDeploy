@@ -120,8 +120,8 @@ stages:
         targetType: 'inline'
         script: |
           $outputs = ConvertFrom-Json '$(ResourceGroupDeploymentOutputs)'
-          foreach ($output in $outputs.PSObject.Properties) {
-          Write-Host "##vso[task.setvariable variable=$($output.Name)]$($output.Value.value)"}
+          #foreach ($output in $outputs.PSObject.Properties) {
+          #Write-Host "##vso[task.setvariable variable=$($output.Name)]$($output.Value.value)"}
           Install-Module VSTeam -Scope CurrentUser -Force
           Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
           $methodParameters = @{
@@ -132,13 +132,13 @@ stages:
           $vg.value.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
           $varName = "sqlServerName"
           $vars.$varName= @{}
-          $vars.$varName.value = $sqlServerName
-          #$vars.$varName.value = $outputs.sqlServerName.value
+          #$vars.$varName.value = $sqlServerName
+          $vars.$varName.value = $outputs.sqlServerName.value
           $vars.$varName.isSecret = $false
           $varName2 = "webAppName"
           $vars.$varName2= @{}
-          $vars.$varName2.value = $webAppName
-          #$vars.$varName2.value  = $outputs.webAppName.value
+          #$vars.$varName2.value = $webAppName
+          $vars.$varName2.value  = $outputs.webAppName.value
           $vars.$varName2.isSecret = $false
           $methodParameters = @{
             id = $vg.value.id
