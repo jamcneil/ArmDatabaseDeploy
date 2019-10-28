@@ -91,6 +91,29 @@ stages:
         artifactName: dropDacpac
       condition: succeededOrFailed()
 
+- stage: 'Provision'
+  displayName: 'Provision the database and web application'
+  jobs: 
+  - job: 'Deploy infrastructure'
+    displayName: 'Deploy infrastructure job'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    variables:
+    - group: 'Release'
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+        deploymentScope: 'Resource Group'
+        ConnectedServiceName: '[EnterYourServiceConnectionName]'
+        subscriptionName: '$(subscription)'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '[EnterANewResourceGroupName]'
+        location: '$(location)'
+        templateLocation: 'Linked artifact'
+        csmFile: 'template.json'
+        deploymentMode: 'Incremental'
+        deploymentOutputs: ResourceGroupDeploymentOutputs
+      
 - stage: DBAVerificationScript
   displayName: 'Script database schema changes'
   dependsOn: Build
@@ -105,6 +128,15 @@ stages:
       runOnce:
         deploy:
           steps:
+          - task: PowerShell@2
+            displayName: Get template output variables
+            inputs:
+              targetType: 'inline'
+              script: |
+                $outputs = ConvertFrom-Json $($env:ResourceGroupDeploymentOutputs)
+                foreach ($output in $outputs.PSObject.Properties) {
+                Write-Host "##vso[task.setvariable variable=RGDO_$($output.Name)]$($output.Value.value)"}
+          
           - download: current
             artifact: dropDacpac
             patterns: '**/*'
@@ -113,10 +145,10 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               authenticationType: 'server'
-              serverName: '$(servername).database.windows.net'
-              databaseName: '$(databasename)'
-              sqlUsername: '$(adminlogin)'
-              sqlPassword: '$(adminPassword)'
+              serverName: '$(sqlServerName).database.windows.net'
+              databaseName: 'tailspindatabase'
+              sqlUsername: 'azuresql'
+              sqlPassword: '$(sqlAdminPassword)'
               deployType: 'DacpacTask'
               deploymentAction: 'Script'
               dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
@@ -127,7 +159,7 @@ stages:
               targetType: 'inline'
               script: | 
                 Write-Host "Auto Generated SQL Update Script:"
-                Get-Content d:\a\1\s\GeneratedOutputFiles\$(databasename)_Script.sql | foreach {Write-Output $_}
+                Get-Content d:\a\1\s\GeneratedOutputFiles\tailspindatabase_Script.sql | foreach {Write-Output $_}
           - task: PowerShell@2
             displayName: Show change script and check for schema changes
             inputs:
@@ -135,10 +167,10 @@ stages:
               script: | 
                 # Print the schema change script
                 Write-Host "Auto Generated SQL Update Script:"
-                Get-Content d:\a\1\s\GeneratedOutputFiles\$(databasename)_Script.sql | foreach {Write-Output $_}
+                Get-Content d:\a\1\s\GeneratedOutputFiles\tailspindatabase_Script.sql | foreach {Write-Output $_}
 
                 # Check for schema changes
-                $file = Get-Content "d:\a\1\s\GeneratedOutputFiles\$(databasename)_Script.sql"
+                $file = Get-Content "d:\a\1\s\GeneratedOutputFiles\tailspindatabase_Script.sql"
                 $containsWord = $file | %{$_ -match "CREATE" -or $_ -match "ALTER" -or $_ -match "DROP"}
                 if ($containsWord -contains $true) {
                   Install-Module VSTeam -Scope CurrentUser -Force
@@ -185,10 +217,10 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               authenticationType: 'server'
-              serverName: '$(servername).database.windows.net'
-              databaseName: '$(databasename)'
-              sqlUsername: '$(adminlogin)'
-              sqlPassword: '$(adminPassword)'
+              serverName: '$(sqlServerName).database.windows.net'
+              databaseName: 'tailspindatabase'
+              sqlUsername: 'azuresql'
+              sqlPassword: '$(sqlAdminPassword)'
               deployType: 'DacpacTask'
               deploymentAction: 'Publish'
               dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
@@ -216,8 +248,8 @@ stages:
                   Variables = $vars}
                 Update-VSTeamVariableGroup @methodParameters
 
-- stage: 'Dev'
-  displayName: 'Deploy to the dev environment'
+- stage: 'Deploy to AppService'
+  displayName: 'Deploy to the app service'
   dependsOn:
   - DBAVerificationScript
   - DBAVerificationApply
@@ -244,52 +276,5 @@ stages:
             displayName: 'Azure App Service Deploy: website'
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              appName: '$(WebAppNameDev)'
-              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
-
-- stage: 'Test'
-  displayName: 'Deploy to the test environment'
-  dependsOn: Dev
-  condition: succeeded('Dev')
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'Ubuntu-16.04'
-    environment: test
-    variables:
-    - group: 'Release'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: drop
-          - task: AzureWebApp@1
-            displayName: 'Azure App Service Deploy: website'
-            inputs:
-              azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              appName: '$(WebAppNameTest)'
-              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
-
-- stage: 'Staging'
-  displayName: 'Deploy to the staging environment'
-  dependsOn: Test
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'Ubuntu-16.04'
-    environment: staging
-    variables:
-    - group: 'Release'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: drop
-          - task: AzureWebApp@1
-            displayName: 'Azure App Service Deploy: website'
-            inputs:
-              azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              appName: '$(WebAppNameStaging)'
+              appName: '$(webAppName)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
