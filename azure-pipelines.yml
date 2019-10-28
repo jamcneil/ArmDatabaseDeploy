@@ -104,13 +104,14 @@ stages:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        ConnectedServiceName: '[EnterYourServiceConnectionName]'
+        ConnectedServiceName: 'TestIacServiceConnection'
         subscriptionName: '$(subscription)'
         action: 'Create Or Update Resource Group'
-        resourceGroupName: '[EnterANewResourceGroupName]'
+        resourceGroupName: 'tailspin-spacegame-web-rg'
         location: '$(location)'
         templateLocation: 'Linked artifact'
         csmFile: 'template.json'
+        csmParametersFile: 'deploymentParameters.json'
         deploymentMode: 'Incremental'
         deploymentOutputs: ResourceGroupDeploymentOutputs
       
@@ -248,7 +249,7 @@ stages:
                   Variables = $vars}
                 Update-VSTeamVariableGroup @methodParameters
 
-- stage: 'Deploy to AppService'
+- stage: 'DeployToAppService'
   displayName: 'Deploy to the app service'
   dependsOn:
   - DBAVerificationScript
