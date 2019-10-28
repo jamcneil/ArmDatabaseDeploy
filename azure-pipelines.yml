@@ -94,7 +94,7 @@ stages:
 - stage: 'Provision'
   displayName: 'Provision the database and web application'
   jobs: 
-  - job: 'Deploy infrastructure'
+  - job: 'DeployInfrastructure'
     displayName: 'Deploy infrastructure job'
     pool:
       vmImage: 'Ubuntu-16.04'
