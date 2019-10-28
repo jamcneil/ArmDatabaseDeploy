@@ -122,14 +122,18 @@ stages:
           # $outputs = ConvertFrom-Json $($env:ResourceGroupDeploymentOutputs)
           # foreach ($output in $outputs.PSObject.Properties) {
           # Write-Host "##vso[task.setvariable variable=$($output.Name)]$($output.Value.value)"}
-          $lastDeployment = Get-AzResourceGroupDeployment -ResourceGroupName tailspin-spacegame-web-rg | Sort Timestamp -Descending | Select -First 1 
-          Write-Host $lastDeployment
-          $sqlServerName = (Get-AzResourceGroupDeployment `
-            -ResourceGroupName tailspin-spacegame-web-rg `
-            -Name $lastDeployment).Outputs.sqlServerName.value
-          $webAppName = (Get-AzResourceGroupDeployment `
-            -ResourceGroupName tailspin-spacegame-web-rg `
-            -Name $lastDeployment).Outputs.webAppName.value
+          # $lastDeployment = Get-AzResourceGroupDeployment -ResourceGroupName tailspin-spacegame-web-rg | Sort Timestamp -Descending | Select -First 1 
+          # Write-Host $lastDeployment
+          $outputs = ConvertFrom-Json $(ResourceGroupDeploymentOutputs)
+          Write-Host $outputs
+          foreach ($output in $outputs.PSObject.Properties) {
+          Write-Host "##vso[task.setvariable variable=$($output.Name)]$($output.Value.value)"}
+          # $sqlServerName = (Get-AzResourceGroupDeployment `
+          #   -ResourceGroupName tailspin-spacegame-web-rg `
+          #   -Name $lastDeployment).Outputs.sqlServerName.value
+          # $webAppName = (Get-AzResourceGroupDeployment `
+          #   -ResourceGroupName tailspin-spacegame-web-rg `
+          #   -Name $lastDeployment).Outputs.webAppName.value
           Install-Module VSTeam -Scope CurrentUser -Force
           Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
           $methodParameters = @{
