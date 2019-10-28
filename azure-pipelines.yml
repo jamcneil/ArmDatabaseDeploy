@@ -158,16 +158,7 @@ stages:
     strategy:
       runOnce:
         deploy:
-          steps:
-          # - task: PowerShell@2
-          #   displayName: Get template output variables
-          #   inputs:
-          #     targetType: 'inline'
-          #     script: |
-          #       $outputs = ConvertFrom-Json $($env:ResourceGroupDeploymentOutputs)
-          #       foreach ($output in $outputs.PSObject.Properties) {
-          #       Write-Host "##vso[task.setvariable variable=RGDO_$($output.Name)]$($output.Value.value)"}
-                
+          steps: 
           - download: current
             artifact: dropDacpac
             patterns: '**/*'
