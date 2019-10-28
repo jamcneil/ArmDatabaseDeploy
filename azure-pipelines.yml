@@ -119,7 +119,7 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          $outputs = ConvertFrom-Json $(ResourceGroupDeploymentOutputs)
+          $outputs = ConvertFrom-Json "$(ResourceGroupDeploymentOutputs)"
           foreach ($output in $outputs.PSObject.Properties) {
           Write-Host "##vso[task.setvariable variable=$($output.Name)]$($output.Value.value)"}
           Install-Module VSTeam -Scope CurrentUser -Force
