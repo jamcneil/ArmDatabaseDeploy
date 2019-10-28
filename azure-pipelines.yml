@@ -122,7 +122,6 @@ stages:
           $outputs = ConvertFrom-Json $($env:ResourceGroupDeploymentOutputs)
           foreach ($output in $outputs.PSObject.Properties) {
           Write-Host "##vso[task.setvariable variable=RGDO_$($output.Name)]$($output.Value.value)"}
-          # Get pipeline variables and add template output to them
           Install-Module VSTeam -Scope CurrentUser -Force
           Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
           $methodParameters = @{
@@ -146,7 +145,8 @@ stages:
             Description = "Release variables"
             Type = "Vsts"
             Variables = $vars}
-          Update-VSTeamVariableGroup @methodParameters}      
+          Update-VSTeamVariableGroup @methodParameters
+
 - stage: DBAVerificationScript
   displayName: 'Script database schema changes'
   dependsOn: Provision
