@@ -122,7 +122,8 @@ stages:
           # $outputs = ConvertFrom-Json $($env:ResourceGroupDeploymentOutputs)
           # foreach ($output in $outputs.PSObject.Properties) {
           # Write-Host "##vso[task.setvariable variable=$($output.Name)]$($output.Value.value)"}
-          $lastDeployment = Get-AzureRmResourceGroupDeployment -ResourceGroupName tailspin-spacegame-web-rg | Sort Timestamp -Descending | Select -First 1 
+          $lastDeployment = Get-AzResourceGroupDeployment -ResourceGroupName tailspin-spacegame-web-rg | Sort Timestamp -Descending | Select -First 1 
+          Write-Host $lastDeployment
           $sqlServerName = (Get-AzResourceGroupDeployment `
             -ResourceGroupName tailspin-spacegame-web-rg `
             -Name $lastDeployment).Outputs.sqlServerName.value
