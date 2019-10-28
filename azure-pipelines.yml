@@ -104,7 +104,7 @@ stages:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        ConnectedServiceName: 'TestIacServiceConnection'
+        ConnectedServiceName: 'Resource Manager - Tailspin - Space Game'
         subscriptionName: '$(subscription)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: 'tailspin-spacegame-web-rg'
@@ -117,7 +117,7 @@ stages:
       
 - stage: DBAVerificationScript
   displayName: 'Script database schema changes'
-  dependsOn: Build
+  dependsOn: Provision
   jobs:
   - deployment: DBAVerificationScript
     pool:
