@@ -318,7 +318,7 @@ stages:
           - task: AzureAppServiceSettings@0
             displayName: Azure App Service Settings
             inputs:
-              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              azureSubscription: '$(subscription)'
               appName: $(webAppName)
               connectionStrings: |
                 [
