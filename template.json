@@ -112,6 +112,19 @@
             }]
         },
         {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "name": "connectionString",
+            "apiVersion": "2015-06-01",
+            "properties": {
+                "contentType": "text/plain",
+                "value": "[concat('Server=tcp:',reference(concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName'))).fullyQualifiedDomainName,',1433;Initial Catalog=tailspindatabase;Persist Security Info=False;User ID=',reference(concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName'))).administratorLogin,';Password=',parameters('adminPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', 'tailspin-spacegame-vault')]",
+                "[resourceId('Microsoft.Sql/servers/databases', concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName')), 'tailspindatabase')]"
+            ]
+        },
+        {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2016-08-01",
             "name": "[concat(parameters('sites_tailspin_space_game_web_name'), variables('uniqueName'))]",
