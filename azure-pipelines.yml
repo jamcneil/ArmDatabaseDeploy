@@ -315,7 +315,7 @@ stages:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(webAppName)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
-              appSettings: -"Connection Strings" "DefaultConnection=$(connectionString)"
+              appSettings: -"ConnectionStrings:DefaultConnection" '$(connectionString)'
           - task: PowerShell@2
             displayName: 'Remove pipeline deployment variables'
             inputs:
