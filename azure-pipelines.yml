@@ -161,9 +161,9 @@ stages:
           steps: 
           - task: AzureKeyVault@1
             inputs:
-            azureSubscription: $(subscription)
-            keyVaultName: 'tailspin-spacegame-vault'
-            secretsFilter: '*'
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              keyVaultName: 'tailspin-spacegame-vault'
+              secretsFilter: '*'
           - download: current
             artifact: dropDacpac
             patterns: '**/*'
@@ -238,9 +238,9 @@ stages:
           steps:
           - task: AzureKeyVault@1
             inputs:
-            azureSubscription: $(subscription)
-            keyVaultName: 'tailspin-spacegame-vault'
-            secretsFilter: '*'
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              keyVaultName: 'tailspin-spacegame-vault'
+              secretsFilter: '*'
           - download: current
             artifact: dropDacpac
             patterns: '**/*'
