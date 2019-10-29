@@ -324,7 +324,7 @@ stages:
                 $vars = @{}
                 $vg.value.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
                 $vars.Remove("sqlServerName")
-                vars.Remove("webAppName")
+                $vars.Remove("webAppName")
                 $methodParameters = @{
                   id = $vg.value.id
                   ProjectName = "$(System.TeamProject)"
