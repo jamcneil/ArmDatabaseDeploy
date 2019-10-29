@@ -224,7 +224,7 @@ stages:
 - stage: DBAVerificationApply
   displayName: 'Apply database schema changes'
   dependsOn: DBAVerificationScript
-  condition: and(succeeded(), eq(variables['schemaChanged'], 'True'))
+  condition: and(succeeded(DBAVerificationScript), eq(variables['schemaChanged'], 'True'))
   jobs:
   - deployment: DBAVerificationApply
     pool:
@@ -315,16 +315,7 @@ stages:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(webAppName)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
-          - task: Bash@3
-            displayName: 'Set connection string'
-            inputs:
-              targetType: 'inline'
-              script: | 
-                az webapp config connection-string set \
-                --name '$(webAppName)' \
-                --resource-group tailspin-space-game-rg \
-                --settings "DefaultConnection=$(connectionString)" \
-                --connection-string-type SQLAzure
+              appSettings: -"Connection Strings" "DefaultConnection=$(connectionString)"
           - task: PowerShell@2
             displayName: 'Remove pipeline deployment variables'
             inputs:
