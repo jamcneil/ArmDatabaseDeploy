@@ -312,19 +312,19 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: '$(subscription)'
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(webAppName)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'         
           - task: AzureAppServiceSettings@0
             displayName: Azure App Service Settings
             inputs:
-              azureSubscription: '$(subscription)'
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: $(webAppName)
               connectionStrings: |
                 [
                   {
                   "name": "DefaultConnection",
-                  "value": $(connectionString),
+                  "value": '$(connectionString)',
                   "type": "AzureSQL",
                   "slotSetting": false
                   }
