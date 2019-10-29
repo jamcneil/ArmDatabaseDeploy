@@ -324,9 +324,8 @@ stages:
                 [
                   {
                   "name": "DefaultConnection",
-                  "value": "$(connectionString)",
-                  "type": "AzureSQL",
-                  "slotSetting": false
+                  "value": '$(connectionString)',
+                  "type": "AzureSQL"
                   }
                 ]
           - task: PowerShell@2
