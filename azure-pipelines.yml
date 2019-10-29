@@ -324,7 +324,7 @@ stages:
                 [
                   {
                   "name": "DefaultConnection",
-                  "value": '$(connectionString)',
+                  "value": "$(connectionString)",
                   "type": "AzureSQL",
                   "slotSetting": false
                   }
