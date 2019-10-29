@@ -159,6 +159,11 @@ stages:
       runOnce:
         deploy:
           steps: 
+          - task: AzureKeyVault@1
+            inputs:
+            azureSubscription: $(subscription)
+            keyVaultName: 'tailspin-spacegame-vault'
+            secretsFilter: '*'
           - download: current
             artifact: dropDacpac
             patterns: '**/*'
@@ -170,7 +175,7 @@ stages:
               serverName: '$(sqlServerName).database.windows.net'
               databaseName: 'tailspindatabase'
               sqlUsername: 'azuresql'
-              sqlPassword: '$(sqlAdminPassword)'
+              sqlPassword: '$(adminPassword)'
               deployType: 'DacpacTask'
               deploymentAction: 'Script'
               dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
@@ -231,6 +236,11 @@ stages:
       runOnce:
         deploy:
           steps:
+          - task: AzureKeyVault@1
+            inputs:
+            azureSubscription: $(subscription)
+            keyVaultName: 'tailspin-spacegame-vault'
+            secretsFilter: '*'
           - download: current
             artifact: dropDacpac
             patterns: '**/*'
@@ -242,7 +252,7 @@ stages:
               serverName: '$(sqlServerName).database.windows.net'
               databaseName: 'tailspindatabase'
               sqlUsername: 'azuresql'
-              sqlPassword: '$(sqlAdminPassword)'
+              sqlPassword: '$(adminPassword)'
               deployType: 'DacpacTask'
               deploymentAction: 'Publish'
               dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
