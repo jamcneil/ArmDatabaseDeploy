@@ -300,35 +300,26 @@ stages:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(webAppName)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
-
-- stage: 'CleanUpVariables'
-  displayName: 'Clean up pipeline variables'
-  dependsOn: DeployToAppService
-  condition: succeeded('DBAVerificationScript')
-  jobs:
-    variables:
-    - group: Release
-    - task: PowerShell@2
-      displayName: 'Remove pipeline variables'
-      inputs:
-        targetType: 'inline'
-        script: | 
-          Install-Module VSTeam -Scope CurrentUser -Force
-          Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
-          $methodParameters = @{
-            ProjectName = "$(System.TeamProject)"
-            Name = "Release"}
-          $vg = Get-VSTeamVariableGroup  @methodParameters 
-          $vars = @{}
-          $vg.value.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
-          $vars.Remove("sqlServerName")
-          vars.Remove("webAppName")
-          $methodParameters = @{
-            id = $vg.value.id
-            ProjectName = "$(System.TeamProject)"
-            Name = "Release"
-            Description = "Release variables"
-            Type = "Vsts"
-            Variables = $vars}
-          Update-VSTeamVariableGroup @methodParameters
-  
+          - task: PowerShell@2
+            displayName: 'Remove pipeline deployment variables'
+            inputs:
+              targetType: 'inline'
+              script: | 
+                Install-Module VSTeam -Scope CurrentUser -Force
+                Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
+                $methodParameters = @{
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "Release"}
+                $vg = Get-VSTeamVariableGroup  @methodParameters 
+                $vars = @{}
+                $vg.value.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
+                $vars.Remove("sqlServerName")
+                vars.Remove("webAppName")
+                $methodParameters = @{
+                  id = $vg.value.id
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "Release"
+                  Description = "Release variables"
+                  Type = "Vsts"
+                  Variables = $vars}
+                Update-VSTeamVariableGroup @methodParameters
