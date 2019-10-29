@@ -315,7 +315,6 @@ stages:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(webAppName)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
-              configurationStrings: -ConnectionStrings:DefaultConnection $(connectionString)
           - task: PowerShell@2
             displayName: 'Remove pipeline deployment variables'
             inputs:
@@ -339,3 +338,17 @@ stages:
                   Type = "Vsts"
                   Variables = $vars}
                 Update-VSTeamVariableGroup @methodParameters
+          - task: AzureAppServiceSettings@0
+            displayName: Azure App Service Settings
+            inputs:
+              azureSubscription: $(subscription)
+              appName: $(webAppName)
+            connectionStrings: |
+              [
+                {
+                "name": "DefaultConnection",
+                "value": $(connectionString),
+                "type": "AzureSQL",
+                "slotSetting": false
+                }
+              ]
