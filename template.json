@@ -24,7 +24,9 @@
             "maxLength": 11
         },
         "adminPassword": {
-            "type": "string"
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 12
         }
     },
     "variables": {
@@ -75,53 +77,6 @@
                 "startIpAddress": "0.0.0.0",
                 "endIpAddress": "0.0.0.0"
             }
-        },
-        {
-            "type": "Microsoft.Sql/servers/databases",
-            "apiVersion": "2017-03-01-preview",
-            "name": "[concat(concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName')), '/tailspindatabase')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName')))]"
-            ],
-            "sku": {
-                "name": "S1",
-                "tier": "Standard"
-            },
-            "kind": "v12.0,user,vcore",
-            "properties": {
-                "collation": "SQL_Latin1_General_CP1_CI_AS",
-                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-                "zoneRedundant": false
-            },
-            "resources": [{
-                "name": "Import",
-                "type": "extensions",
-                "apiVersion": "2014-04-01",
-                "dependsOn": [
-                    "[resourceId('Microsoft.Sql/servers/databases', concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName')), 'tailspindatabase')]"
-                ],
-                "properties": {
-                    "storageKeyType": "SharedAccessKey",
-                    "storageKey": "?",
-                    "storageUri": "https://sqldbtutorial.blob.core.windows.net/bacpacs/tailspindatabase.bacpac",
-                    "administratorLogin": "azuresql",
-                    "administratorLoginPassword": "[parameters('adminPassword')]",
-                    "operationMode": "Import"
-                }
-            }]
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults/secrets",
-            "name": "tailspin-spacegame-vault/connectionString",
-            "apiVersion": "2015-06-01",
-            "properties": {
-                "contentType": "text/plain",
-                "value": "[concat('Server=tcp:',reference(concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName'))).fullyQualifiedDomainName,',1433;Initial Catalog=tailspindatabase;Persist Security Info=False;User ID=',reference(concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName'))).administratorLogin,';Password=',parameters('adminPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers/databases', concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName')), 'tailspindatabase')]"
-            ]
         },
         {
             "type": "Microsoft.Web/sites",
@@ -177,13 +132,6 @@
                     "default.aspx",
                     "index.php",
                     "hostingstart.html"
-                ],
-                 "connectionStrings": [
-                    {
-                    "name": "DefaultConnection",
-                    "connectionString": "[concat('Server=tcp:',reference(concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName'))).fullyQualifiedDomainName,',1433;Initial Catalog=tailspindatabase;Persist Security Info=False;User ID=',reference(concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName'))).administratorLogin,';Password=',parameters('adminPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]",
-                    "type": "SQLAzure"
-                    }
                 ],
                 "netFrameworkVersion": "v4.0",
                 "phpVersion": "5.6",
@@ -269,15 +217,5 @@
                 "hostNameType": "Verified"
             }
         }
-    ],
-    "outputs": {
-        "webAppName": {
-        "type": "string",
-        "value": "[concat(parameters('sites_tailspin_space_game_web_name'), variables('uniqueName'))]"
-        },
-        "sqlServerName": {
-        "type": "string",
-        "value": "[concat(parameters('servers_tailspin_space_game_sql_name'), variables('uniqueName'))]"
-        }
-    }
+    ]
 }
