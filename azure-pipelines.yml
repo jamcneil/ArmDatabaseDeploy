@@ -321,4 +321,4 @@ stages:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: $(webAppName)
               connectionStrings: |
-                [{ "name": "DefaultConnection","value": $(connectionString),"type": "SQLAzure","slotSetting": false }]
+                [{ "name": "DefaultConnection","value": "$(connectionString)","type": "SQLAzure","slotSetting": false }]
