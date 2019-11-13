@@ -216,7 +216,7 @@ stages:
                     id = $vg.value.id
                     ProjectName = "$(System.TeamProject)"
                     Name = "Release"
-                    Description = "Release variables"
+                    Description = ""
                     Type = "Vsts"
                     Variables = $vars}
                   Update-VSTeamVariableGroup @methodParameters}
@@ -275,7 +275,7 @@ stages:
                   id = $vg.value.id
                   ProjectName = "$(System.TeamProject)"
                   Name = "Release"
-                  Description = "Release variables"
+                  Description = ""
                   Type = "Vsts"
                   Variables = $vars}
                 Update-VSTeamVariableGroup @methodParameters
