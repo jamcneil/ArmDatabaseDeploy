@@ -5,10 +5,16 @@
         "deployPrefix": {
             "value": "-dev-"
         },
+        "uniqueSuffix": {
+          "value": "767676"
+        },
+        "keyVaultName": {
+          "value": "tailspin-vault-333"
+        },
         "adminPassword": {
             "reference": {
               "keyVault": {
-                "id": "/subscriptions/de53e040-65b5-4cee-bab9-5505db93125a/resourceGroups/tailspin-spacegame-web-rg/providers/Microsoft.KeyVault/vaults/tailspin-spacegame-vault"
+                "id": "https://tailspin-vault-333.vault.azure.net/secrets/adminPassword/7a89c79b3eb24e13b612b18a0d531dc0"
               },
               "secretName": "adminPassword"
             }

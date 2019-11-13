@@ -114,36 +114,36 @@ stages:
         csmParametersFile: 'deploymentParameters.json'
         deploymentMode: 'Incremental'
         deploymentOutputs: ResourceGroupDeploymentOutputs
-    - task: PowerShell@2
-      displayName: Get template output variables and put them in pipeline variables
-      inputs:
-        targetType: 'inline'
-        script: |
-          $outputs = ConvertFrom-Json '$(ResourceGroupDeploymentOutputs)'
-          Install-Module VSTeam -Scope CurrentUser -Force
-          Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
-          $methodParameters = @{
-            ProjectName = "$(System.TeamProject)"
-            Name = "Release"}
-          $vg = Get-VSTeamVariableGroup @methodParameters
-          $vars = @{}
-          $vg.value.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
-          $varName = "sqlServerName"
-          $vars.$varName= @{}
-          $vars.$varName.value = $outputs.sqlServerName.value
-          $vars.$varName.isSecret = $false
-          $varName2 = "webAppName"
-          $vars.$varName2= @{}
-          $vars.$varName2.value  = $outputs.webAppName.value
-          $vars.$varName2.isSecret = $false
-          $methodParameters = @{
-            id = $vg.value.id
-            ProjectName = "$(System.TeamProject)"
-            Name = "Release"
-            Description = "Release variables"
-            Type = "Vsts"
-            Variables = $vars}
-          Update-VSTeamVariableGroup @methodParameters
+    # - task: PowerShell@2
+    #   displayName: Get template output variables and put them in pipeline variables
+    #   inputs:
+    #     targetType: 'inline'
+    #     script: |
+    #       $outputs = ConvertFrom-Json '$(ResourceGroupDeploymentOutputs)'
+    #       Install-Module VSTeam -Scope CurrentUser -Force
+    #       Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
+    #       $methodParameters = @{
+    #         ProjectName = "$(System.TeamProject)"
+    #         Name = "Release"}
+    #       $vg = Get-VSTeamVariableGroup @methodParameters
+    #       $vars = @{}
+    #       $vg.value.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
+    #       $varName = "sqlServerName"
+    #       $vars.$varName= @{}
+    #       $vars.$varName.value = $outputs.sqlServerName.value
+    #       $vars.$varName.isSecret = $false
+    #       $varName2 = "webAppName"
+    #       $vars.$varName2= @{}
+    #       $vars.$varName2.value  = $outputs.webAppName.value
+    #       $vars.$varName2.isSecret = $false
+    #       $methodParameters = @{
+    #         id = $vg.value.id
+    #         ProjectName = "$(System.TeamProject)"
+    #         Name = "Release"
+    #         Description = "Release variables"
+    #         Type = "Vsts"
+    #         Variables = $vars}
+    #       Update-VSTeamVariableGroup @methodParameters
 
 - stage: DBAVerificationScript
   displayName: 'Script database schema changes'
@@ -162,7 +162,7 @@ stages:
           - task: AzureKeyVault@1
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              keyVaultName: 'tailspin-spacegame-vault'
+              keyVaultName: '$(keyVaultName)'
               secretsFilter: '*'
           - download: current
             artifact: dropDacpac
@@ -172,7 +172,7 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               authenticationType: 'server'
-              serverName: '$(sqlServerName).database.windows.net'
+              serverName: 'tailspin-space-game-sql-dev-$(uniqueSuffix).database.windows.net'
               databaseName: 'tailspindatabase'
               sqlUsername: 'azuresql'
               sqlPassword: '$(adminPassword)'
@@ -239,7 +239,7 @@ stages:
           - task: AzureKeyVault@1
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              keyVaultName: 'tailspin-spacegame-vault'
+              keyVaultName: '$(keyVaultName)'
               secretsFilter: '*'
           - download: current
             artifact: dropDacpac
@@ -249,7 +249,7 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               authenticationType: 'server'
-              serverName: '$(sqlServerName).database.windows.net'
+              serverName: 'tailspin-space-game-sql-dev-$(uniqueSuffix).database.windows.net'
               databaseName: 'tailspindatabase'
               sqlUsername: 'azuresql'
               sqlPassword: '$(adminPassword)'
@@ -280,8 +280,8 @@ stages:
                   Variables = $vars}
                 Update-VSTeamVariableGroup @methodParameters
 
-- stage: 'DeployToAppService'
-  displayName: 'Deploy to the app service'
+- stage: 'DeployToDevAppService'
+  displayName: 'Deploy to the dev app service'
   dependsOn:
   - DBAVerificationScript
   - DBAVerificationApply
@@ -305,7 +305,7 @@ stages:
           - task: AzureKeyVault@1
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              keyVaultName: 'tailspin-spacegame-vault'
+              keyVaultName: '$(keyVaultName)'
               secretsFilter: '*'
           - download: current
             artifact: drop
@@ -313,12 +313,12 @@ stages:
             displayName: 'Azure App Service Deploy: website'
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              appName: '$(webAppName)'
+              appName: 'tailspin-space-game-web-dev-$(uniqueSuffix)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'         
           - task: AzureAppServiceSettings@1
             displayName: Azure App Service Settings
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              appName: $(webAppName)
+              appName: 'tailspin-space-game-web-dev-$(uniqueSuffix)'
               connectionStrings: |
                 [{ "name": "DefaultConnection","value": "$(connectionString)","type": "SQLAzure","slotSetting": false }]
