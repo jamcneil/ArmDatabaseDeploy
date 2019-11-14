@@ -146,24 +146,24 @@ stages:
                     ProjectName = "$(System.TeamProject)"
                     Name = "Release"}
                   $vg = Get-VSTeamVariableGroup @methodParameters
-                  Write-Host $vg
-                  Write-Host $vg.variables
-                  Write-Host $vg.value
-                  Write-Host $vg.value.variables
-                  Write-Host $vg.value.variables.($_.Name)
-                  Write-Host $(System.TeamProject)
-                  # $vars = @{}
-                  # $vg.value.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
-                  # $varName = "schemaChanged"
-                  # $vars.$varName= @{}
-                  # $vars.$varName.value = "True"
-                  # $vars.$varName.isSecret = $false
-                  # $methodParameters = @{
-                  #   id = $vg.value.id
-                  #   ProjectName = "$(System.TeamProject)"
-                  #   Name = "Release"
-                  #   Description = "Release variables"
-                  #   Type = "Vsts"
-                  #   Variables = $vars}
-                  # Update-VSTeamVariableGroup @methodParameters
+                  # Write-Host $vg
+                  # Write-Host $vg.variables
+                  # Write-Host $vg.value
+                  # Write-Host $vg.value.variables
+                  # Write-Host $vg.value.variables.($_.Name)
+                  # Write-Host $(System.TeamProject)
+                  $vars = @{}
+                  $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
+                  $varName = "schemaChanged"
+                  $vars.$varName= @{}
+                  $vars.$varName.value = "True"
+                  $vars.$varName.isSecret = $false
+                  $methodParameters = @{
+                    id = $vg.value.id
+                    ProjectName = "$(System.TeamProject)"
+                    Name = "Release"
+                    Description = "Release variables"
+                    Type = "Vsts"
+                    Variables = $vars}
+                  Update-VSTeamVariableGroup @methodParameters
                   }
