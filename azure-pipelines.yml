@@ -150,6 +150,7 @@ stages:
                   Write-Host $vg.value
                   Write-Host $vg.value.variables
                   Write-Host $vg.value.variables.($_.Name)
+                  Write-Host $(System.TeamProject)
                   # $vars = @{}
                   # $vg.value.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
                   # $varName = "schemaChanged"
