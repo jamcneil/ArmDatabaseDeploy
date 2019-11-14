@@ -153,7 +153,7 @@ stages:
                   # Write-Host $vg.value.variables.($_.Name)
                   # Write-Host $(System.TeamProject)
                   $vars = @{}
-                  $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.value.variables.($_.Name)}
+                  $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
                   $varName = "schemaChanged"
                   $vars.$varName= @{}
                   $vars.$varName.value = "True"
