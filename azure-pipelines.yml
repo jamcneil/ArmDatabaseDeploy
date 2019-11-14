@@ -159,7 +159,7 @@ stages:
                   $vars.$varName.value = "True"
                   $vars.$varName.isSecret = $false
                   $methodParameters = @{
-                    id = $vg.value.id
+                    id = $vg.id
                     ProjectName = "$(System.TeamProject)"
                     Name = "Release"
                     Description = "Release variables"
