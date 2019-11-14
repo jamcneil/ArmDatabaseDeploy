@@ -147,6 +147,7 @@ stages:
                     Name = "Release"}
                   $vg = Get-VSTeamVariableGroup @methodParameters
                   Write-Host $vg
+                  Write-Host $vg.variables
                   Write-Host $vg.value
                   Write-Host $vg.value.variables
                   Write-Host $vg.value.variables.($_.Name)
