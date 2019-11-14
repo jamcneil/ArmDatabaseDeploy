@@ -190,7 +190,8 @@ stages:
                   #   Description = ""
                   #   Type = "Vsts"
                   #   Variables = $vars}
-                  # Update-VSTeamVariableGroup @methodParameters}
+                  # Update-VSTeamVariableGroup @methodParameters
+                  }
 
 - stage: DBAVerificationApply
   displayName: 'Apply database schema changes'
