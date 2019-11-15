@@ -93,6 +93,7 @@ stages:
 
 - stage: 'Provision'
   displayName: 'Provision the database and web application'
+  dependsOn: Build
   jobs: 
   - job: 'DeployInfrastructure'
     displayName: 'Deploy infrastructure job'
